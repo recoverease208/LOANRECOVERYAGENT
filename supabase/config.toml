@@ -1,0 +1,28 @@
+project_id = "settlie-ai"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[auth]
+enabled = true
+site_url = "http://127.0.0.1:5173"
+additional_redirect_urls = [
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "https://your-vercel-domain.vercel.app",
+  "https://your-vercel-domain.vercel.app/reset-password",
+  "https://your-vercel-domain.vercel.app/borrower-login"
+]
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+
+[storage]
+enabled = true
+
+[edge_runtime]
+enabled = true
+policy = "per_worker"

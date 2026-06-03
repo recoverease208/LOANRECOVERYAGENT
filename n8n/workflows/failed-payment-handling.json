@@ -1,0 +1,10 @@
+{
+  "name": "Settlie AI - Failed Payment Handling",
+  "nodes": [
+    { "parameters": { "httpMethod": "POST", "path": "settlie-ai/payment-failed", "responseMode": "lastNode" }, "name": "Failed payment event", "type": "n8n-nodes-base.webhook", "typeVersion": 2, "position": [0, 0] },
+    { "parameters": { "amount": 3, "unit": "minutes" }, "name": "Retry delay", "type": "n8n-nodes-base.wait", "typeVersion": 1, "position": [220, 0] },
+    { "parameters": { "method": "POST", "url": "={{$env.COMMUNICATION_WEBHOOK_URL}}", "sendBody": true }, "name": "Notify borrower", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [460, 0] },
+    { "parameters": { "operation": "insert", "tableId": "workflow_runs" }, "name": "Log failed job", "type": "n8n-nodes-base.supabase", "typeVersion": 1, "position": [700, 0] }
+  ],
+  "connections": { "Failed payment event": { "main": [[{ "node": "Retry delay", "type": "main", "index": 0 }]] }, "Retry delay": { "main": [[{ "node": "Notify borrower", "type": "main", "index": 0 }]] }, "Notify borrower": { "main": [[{ "node": "Log failed job", "type": "main", "index": 0 }]] } }
+}

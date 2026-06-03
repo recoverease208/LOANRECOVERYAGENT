@@ -1,0 +1,10 @@
+{
+  "name": "Settlie AI - EMI Reminder",
+  "nodes": [
+    { "parameters": { "rule": { "interval": [{ "field": "hours", "hoursInterval": 1 }] } }, "name": "Hourly schedule", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1, "position": [0, 0] },
+    { "parameters": { "operation": "getAll", "tableId": "reminders", "filters": { "conditions": [{ "keyName": "reminder_status", "condition": "eq", "keyValue": "scheduled" }] } }, "name": "Fetch due reminders", "type": "n8n-nodes-base.supabase", "typeVersion": 1, "position": [240, 0] },
+    { "parameters": { "method": "POST", "url": "={{$env.COMMUNICATION_WEBHOOK_URL}}", "sendBody": true, "bodyParameters": { "parameters": [{ "name": "reminder", "value": "={{$json}}" }] } }, "name": "Send SMS WhatsApp Email", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [480, 0] },
+    { "parameters": { "operation": "update", "tableId": "reminders", "filters": { "conditions": [{ "keyName": "id", "condition": "eq", "keyValue": "={{$json.id}}" }] }, "fieldsUi": { "fieldValues": [{ "fieldId": "reminder_status", "fieldValue": "sent" }] } }, "name": "Mark sent", "type": "n8n-nodes-base.supabase", "typeVersion": 1, "position": [720, 0] }
+  ],
+  "connections": { "Hourly schedule": { "main": [[{ "node": "Fetch due reminders", "type": "main", "index": 0 }]] }, "Fetch due reminders": { "main": [[{ "node": "Send SMS WhatsApp Email", "type": "main", "index": 0 }]] }, "Send SMS WhatsApp Email": { "main": [[{ "node": "Mark sent", "type": "main", "index": 0 }]] } }
+}

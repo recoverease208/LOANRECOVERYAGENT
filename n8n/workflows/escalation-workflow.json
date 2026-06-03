@@ -1,0 +1,10 @@
+{
+  "name": "Settlie AI - Escalation Workflow",
+  "nodes": [
+    { "parameters": { "rule": { "interval": [{ "field": "days", "daysInterval": 1 }] } }, "name": "Daily trigger", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1, "position": [0, 0] },
+    { "parameters": { "operation": "getAll", "tableId": "loans", "filters": { "conditions": [{ "keyName": "overdue_days", "condition": "gte", "keyValue": "30" }] } }, "name": "Find threshold breaches", "type": "n8n-nodes-base.supabase", "typeVersion": 1, "position": [220, 0] },
+    { "parameters": { "operation": "insert", "tableId": "escalations" }, "name": "Assign recovery agent", "type": "n8n-nodes-base.supabase", "typeVersion": 1, "position": [460, 0] },
+    { "parameters": { "operation": "insert", "tableId": "notifications" }, "name": "Notify manager", "type": "n8n-nodes-base.supabase", "typeVersion": 1, "position": [700, 0] }
+  ],
+  "connections": { "Daily trigger": { "main": [[{ "node": "Find threshold breaches", "type": "main", "index": 0 }]] }, "Find threshold breaches": { "main": [[{ "node": "Assign recovery agent", "type": "main", "index": 0 }]] }, "Assign recovery agent": { "main": [[{ "node": "Notify manager", "type": "main", "index": 0 }]] } }
+}

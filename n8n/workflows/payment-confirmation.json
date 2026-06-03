@@ -1,0 +1,9 @@
+{
+  "name": "Settlie AI - Payment Confirmation",
+  "nodes": [
+    { "parameters": { "httpMethod": "POST", "path": "settlie-ai/razorpay", "responseMode": "lastNode" }, "name": "Razorpay webhook", "type": "n8n-nodes-base.webhook", "typeVersion": 2, "position": [0, 0] },
+    { "parameters": { "method": "POST", "url": "={{$env.SUPABASE_FUNCTIONS_URL}}/razorpay-webhook", "sendHeaders": true, "headerParameters": { "parameters": [{ "name": "x-razorpay-signature", "value": "={{$headers['x-razorpay-signature']}}" }] }, "sendBody": true, "specifyBody": "json", "jsonBody": "={{$json}}" }, "name": "Verify and update payment", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [260, 0] },
+    { "parameters": { "method": "POST", "url": "={{$env.RECEIPT_WEBHOOK_URL}}", "sendBody": true }, "name": "Generate receipt", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [520, 0] }
+  ],
+  "connections": { "Razorpay webhook": { "main": [[{ "node": "Verify and update payment", "type": "main", "index": 0 }]] }, "Verify and update payment": { "main": [[{ "node": "Generate receipt", "type": "main", "index": 0 }]] } }
+}

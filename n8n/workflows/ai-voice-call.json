@@ -1,0 +1,10 @@
+{
+  "name": "Settlie AI - AI Voice Call Workflow",
+  "nodes": [
+    { "parameters": { "httpMethod": "POST", "path": "settlie-ai/voice-call", "responseMode": "lastNode" }, "name": "Voice call trigger", "type": "n8n-nodes-base.webhook", "typeVersion": 2, "position": [0, 0] },
+    { "parameters": { "method": "POST", "url": "={{$env.TWILIO_VOICE_URL}}", "sendBody": true }, "name": "Start Twilio call", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [240, 0] },
+    { "parameters": { "method": "POST", "url": "={{$env.SUPABASE_FUNCTIONS_URL}}/ai-assistant", "sendBody": true }, "name": "Summarize call", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [480, 0] },
+    { "parameters": { "operation": "insert", "tableId": "communications" }, "name": "Save call summary", "type": "n8n-nodes-base.supabase", "typeVersion": 1, "position": [720, 0] }
+  ],
+  "connections": { "Voice call trigger": { "main": [[{ "node": "Start Twilio call", "type": "main", "index": 0 }]] }, "Start Twilio call": { "main": [[{ "node": "Summarize call", "type": "main", "index": 0 }]] }, "Summarize call": { "main": [[{ "node": "Save call summary", "type": "main", "index": 0 }]] } }
+}

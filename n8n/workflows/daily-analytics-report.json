@@ -1,0 +1,9 @@
+{
+  "name": "Settlie AI - Daily Analytics Report",
+  "nodes": [
+    { "parameters": { "rule": { "interval": [{ "field": "days", "daysInterval": 1 }] } }, "name": "Daily schedule", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1, "position": [0, 0] },
+    { "parameters": { "operation": "getAll", "tableId": "payments" }, "name": "Fetch payments", "type": "n8n-nodes-base.supabase", "typeVersion": 1, "position": [220, 0] },
+    { "parameters": { "method": "POST", "url": "={{$env.RESEND_REPORT_URL}}", "sendBody": true }, "name": "Send admin summary", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [460, 0] }
+  ],
+  "connections": { "Daily schedule": { "main": [[{ "node": "Fetch payments", "type": "main", "index": 0 }]] }, "Fetch payments": { "main": [[{ "node": "Send admin summary", "type": "main", "index": 0 }]] } }
+}

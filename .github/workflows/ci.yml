@@ -1,0 +1,39 @@
+name: Settlie AI CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run test
+      - run: npm run build
+      - name: Validate required environment names
+        run: |
+          test -f .env.example
+          test -f .env.production.example
+          test -f supabase/.env.example
+          test -f n8n/.env.example
+          grep -q VITE_APP_URL .env.example
+          grep -q VITE_SUPABASE_URL .env.example
+          grep -q VITE_RAZORPAY_KEY_ID .env.example
+          grep -q SUPABASE_SERVICE_ROLE_KEY supabase/.env.example
+          grep -q TWILIO_ACCOUNT_SID supabase/.env.example
+
+  deploy-preview:
+    needs: validate
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Connect Vercel project and Supabase deploy secrets to enable preview deployments."

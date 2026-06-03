@@ -1,0 +1,10 @@
+{
+  "name": "Settlie AI - Missed Payment Follow-Up",
+  "nodes": [
+    { "parameters": { "rule": { "interval": [{ "field": "hours", "hoursInterval": 6 }] } }, "name": "Schedule", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1, "position": [0, 0] },
+    { "parameters": { "operation": "getAll", "tableId": "loans", "filters": { "conditions": [{ "keyName": "loan_status", "condition": "eq", "keyValue": "overdue" }] } }, "name": "Fetch overdue loans", "type": "n8n-nodes-base.supabase", "typeVersion": 1, "position": [220, 0] },
+    { "parameters": { "method": "POST", "url": "={{$env.SUPABASE_FUNCTIONS_URL}}/ai-assistant", "sendHeaders": true, "headerParameters": { "parameters": [{ "name": "Authorization", "value": "Bearer {{$env.SUPABASE_SERVICE_ROLE_KEY}}" }] }, "sendBody": true, "bodyParameters": { "parameters": [{ "name": "borrowerId", "value": "={{$json.borrower_id}}" }, { "name": "tone", "value": "empathetic" }, { "name": "channel", "value": "whatsapp" }, { "name": "context", "value": "={{JSON.stringify($json)}}" }] } }, "name": "Generate AI follow-up", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [460, 0] },
+    { "parameters": { "method": "POST", "url": "={{$env.COMMUNICATION_WEBHOOK_URL}}", "sendBody": true }, "name": "Notify borrower", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [700, 0] }
+  ],
+  "connections": { "Schedule": { "main": [[{ "node": "Fetch overdue loans", "type": "main", "index": 0 }]] }, "Fetch overdue loans": { "main": [[{ "node": "Generate AI follow-up", "type": "main", "index": 0 }]] }, "Generate AI follow-up": { "main": [[{ "node": "Notify borrower", "type": "main", "index": 0 }]] } }
+}
